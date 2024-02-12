@@ -1,7 +1,11 @@
-import { greetUser } from '$utils/greet';
+import { initAnimations } from './animations';
 
 window.Webflow ||= [];
 window.Webflow.push(() => {
-  const name = 'John Doe';
-  greetUser(name);
+  main();
 });
+
+function main() {
+  console.log('Webflow loaded');
+  initAnimations();
+}
