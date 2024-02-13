@@ -151,7 +151,7 @@ const animations: Record<string, AnimationDefinition> = {
 };
 
 export function initAnimations(): void {
-  const elements = document.querySelectorAll('[data-animation]');
+  const elements = document.querySelectorAll('[data-ld-animation]');
 
   elements.forEach((element) => {
     if (element instanceof HTMLElement) {
@@ -161,8 +161,8 @@ export function initAnimations(): void {
 }
 
 function handleAnimation(element: HTMLElement): void {
-  const animation = element.getAttribute('data-animation');
-  const triggerType = element.getAttribute('data-trigger') || 'scroll-in-view';
+  const animation = element.getAttribute('data-ld-animation');
+  const triggerType = element.getAttribute('data-ld-trigger') || 'scroll-in-view';
 
   if (!animation) {
     console.warn('No animation attribute found');
@@ -216,24 +216,32 @@ function applyTrigger(
       });
       break;
     case 'scroll-in-view':
-      document.addEventListener('scroll', () => {
-        if (elementIsInView(element)) {
-          element.style.visibility = 'visible';
-          animationInstance.play();
-        }
-      });
+      initObserver(element, animationInstance);
       break;
     default:
       console.warn(`Unknown trigger type: ${triggerType}`);
   }
 }
 
-function elementIsInView(element: HTMLElement): boolean {
-  const rect = element.getBoundingClientRect();
-  return (
-    rect.top >= 0 &&
-    rect.left >= 0 &&
-    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-    rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+function initObserver(element: HTMLElement, animationInstance: GSAPAnimation) {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const element = entry.target as HTMLElement;
+          element.style.visibility = 'visible';
+          animationInstance.play();
+          observer.unobserve(element);
+        }
+      });
+    },
+    {
+      root: null,
+      rootMargin: '0% 0px -50% 0px',
+      threshold: 0.01,
+    }
   );
+
+  const parent = element.parentNode as HTMLElement;
+  observer.observe(parent);
 }
