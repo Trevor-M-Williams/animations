@@ -163,22 +163,34 @@ export function initAnimations(): void {
 function handleAnimation(element: HTMLElement): void {
   const animation = element.getAttribute('data-ld-animation');
   const triggerType = element.getAttribute('data-ld-trigger') || 'scroll-in-view';
+  const delay = parseFloat(element.getAttribute('data-ld-delay') || '0');
+  const delayInSeconds = delay * 0.001;
 
   if (!animation) {
     console.warn('No animation attribute found');
     return;
   }
 
-  const { gsapFunction, properties } = animations[animation];
+  const animationDefinition = animations[animation];
+  if (!animationDefinition) {
+    console.warn(`No animation definition found for ${animation}`);
+    return;
+  }
 
+  const { gsapFunction, properties } = animationDefinition;
+
+  const animationProperties = { ...properties, delay: delayInSeconds };
   let animationInstance;
 
   switch (gsapFunction) {
     case 'from':
-      animationInstance = gsap.from(element, properties);
+      animationInstance = gsap.from(element, animationProperties);
       break;
     case 'fromTo':
-      animationInstance = gsap.fromTo(element, properties.from!, properties.to!);
+      animationInstance = gsap.fromTo(element, properties.from!, {
+        ...properties.to!,
+        delay: delay,
+      });
       break;
     default:
       console.warn(`Unknown gsap function: ${gsapFunction}`);
