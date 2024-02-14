@@ -1,5 +1,3 @@
-import gsap from 'gsap';
-
 interface AnimationProperties {
   clipPath?: string;
   duration?: number;
@@ -14,7 +12,7 @@ interface AnimationDefinition {
   properties: AnimationProperties;
 }
 
-const animations: Record<string, AnimationDefinition> = {
+export const animations: Record<string, AnimationDefinition> = {
   'reveal-right': {
     gsapFunction: 'from',
     properties: {
@@ -149,111 +147,3 @@ const animations: Record<string, AnimationDefinition> = {
     },
   },
 };
-
-export function initAnimations(): void {
-  const elements = document.querySelectorAll('[data-ld-animation]');
-
-  elements.forEach((element) => {
-    if (element instanceof HTMLElement) {
-      handleAnimation(element);
-    }
-  });
-}
-
-function handleAnimation(element: HTMLElement): void {
-  const animation = element.getAttribute('data-ld-animation');
-  const triggerType = element.getAttribute('data-ld-trigger') || 'scroll-in-view';
-  const delay = parseFloat(element.getAttribute('data-ld-delay') || '0');
-  const delayInSeconds = delay * 0.001;
-
-  if (!animation) {
-    console.warn('No animation attribute found');
-    return;
-  }
-
-  const animationDefinition = animations[animation];
-  if (!animationDefinition) {
-    console.warn(`No animation definition found for ${animation}`);
-    return;
-  }
-
-  const { gsapFunction, properties } = animationDefinition;
-
-  const animationProperties = { ...properties, delay: delayInSeconds };
-  let animationInstance;
-
-  switch (gsapFunction) {
-    case 'from':
-      animationInstance = gsap.from(element, animationProperties);
-      break;
-    case 'fromTo':
-      animationInstance = gsap.fromTo(element, properties.from!, {
-        ...properties.to!,
-        delay: delay,
-      });
-      break;
-    default:
-      console.warn(`Unknown gsap function: ${gsapFunction}`);
-      return;
-  }
-
-  applyTrigger(element, animationInstance, triggerType);
-}
-
-function applyTrigger(
-  element: HTMLElement,
-  animationInstance: GSAPAnimation,
-  triggerType: string
-): void {
-  switch (triggerType) {
-    case 'click':
-      element.parentNode?.addEventListener('click', () => {
-        element.style.visibility = 'visible';
-        animationInstance.play();
-      });
-      break;
-    case 'hover':
-      element.parentNode?.addEventListener('mouseenter', () => {
-        element.style.visibility = 'visible';
-        animationInstance.play();
-      });
-      element.parentNode?.addEventListener('mouseleave', () => {
-        animationInstance.reverse();
-      });
-      break;
-    case 'load':
-      window.addEventListener('load', () => {
-        element.style.visibility = 'visible';
-        animationInstance.play();
-      });
-      break;
-    case 'scroll-in-view':
-      initObserver(element, animationInstance);
-      break;
-    default:
-      console.warn(`Unknown trigger type: ${triggerType}`);
-  }
-}
-
-function initObserver(element: HTMLElement, animationInstance: GSAPAnimation) {
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const element = entry.target as HTMLElement;
-          element.style.visibility = 'visible';
-          animationInstance.play();
-          observer.unobserve(element);
-        }
-      });
-    },
-    {
-      root: null,
-      rootMargin: '0% 0px -50% 0px',
-      threshold: 0.01,
-    }
-  );
-
-  const parent = element.parentNode as HTMLElement;
-  observer.observe(parent);
-}
