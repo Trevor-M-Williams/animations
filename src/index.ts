@@ -54,7 +54,7 @@ function handleDefaultAnimation(element: HTMLElement, animation: string): void {
     case 'fromTo':
       animationInstance = gsap.fromTo(element, properties.from!, {
         ...properties.to!,
-        delay: delay,
+        delay: delayInSeconds,
       });
       break;
     default:
