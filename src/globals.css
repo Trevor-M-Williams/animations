@@ -1,3 +1,10 @@
+[data-ld-animation] {
+  visibility: hidden;
+}
+.word {
+  display: inline-flex;
+  flex-wrap: wrap;
+}
 .letter {
   display: inline-block;
 }
