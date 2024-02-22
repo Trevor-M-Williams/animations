@@ -1,4 +1,7 @@
 interface AnimationProperties {
+  opacity?: number;
+  x?: string;
+  y?: string;
   clipPath?: string;
   duration?: number;
   ease?: string;
@@ -13,6 +16,57 @@ interface AnimationDefinition {
 }
 
 export const animations: Record<string, AnimationDefinition> = {
+  fade: {
+    gsapFunction: 'from',
+    properties: {
+      opacity: 0,
+      duration: 1,
+      ease: 'power3.out',
+      paused: true,
+    },
+  },
+  'fade-up': {
+    gsapFunction: 'from',
+    properties: {
+      opacity: 0,
+      y: '50px',
+      duration: 1,
+      ease: 'power3.out',
+      paused: true,
+    },
+  },
+  'fade-down': {
+    gsapFunction: 'from',
+    properties: {
+      opacity: 0,
+      y: '-50px',
+      duration: 1,
+      ease: 'power3.out',
+      paused: true,
+    },
+  },
+  'fade-left': {
+    gsapFunction: 'from',
+    properties: {
+      opacity: 0,
+      x: '-50px',
+      duration: 1,
+      ease: 'power3.out',
+      paused: true,
+    },
+  },
+  'fade-right': {
+    gsapFunction: 'from',
+    properties: {
+      opacity: 0,
+      x: '50px',
+      duration: 1,
+      ease: 'power3.out',
+      paused: true,
+    },
+  },
+
+  // Image reveal animations
   'reveal-right': {
     gsapFunction: 'from',
     properties: {
